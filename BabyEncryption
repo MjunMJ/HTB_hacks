@@ -1,0 +1,29 @@
+encrypted = open("msg.enc","r").read()
+print(encrypted)
+
+encrypted_b = bytes.fromhex(encrypted)
+
+#(123 * char + 18) % 256 means 123*char + 18 = 256n + encrypted
+#123*char = 256n + (encrypted -18)
+#Apply %256 to both sides, (123*char) mod256 = (encrypted -18)
+#Since b=(a-1⋅r) mod(n), where b⋅a-1 mod(n) = 1, char = 179*(encrypted -18) mod256
+
+#find x in (123*x)mod256 that gives 1
+def mod_inverse(a,m):
+  for x in range(1,m):
+    if (a*x) % m == 1:
+      return x
+  return None
+
+x = mod_inverse(123,256)
+
+message =[]
+
+for b in encrypted_b:
+    c = b-18
+    char = (x*c)%256
+    message.append(char)
+
+message_b = bytes(message)
+
+print(message_b.decode("ascii"))
